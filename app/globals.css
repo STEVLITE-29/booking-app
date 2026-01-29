@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Backgrounds */
+  --background-neutral: #f0f2f5; /* outermost background */
+  --background-white: #ffffff; /* innermost background */
+
+  /* Blues */
+  --blue-300: #0d6efd; /* buttons bg and primary color */
+  --blue-500: #0054e4; /* card blue */
+  --blue-700: #0a369d; /* dark buttons bg (smaller buttons) */
+  --blue-900: #000031; /* deepest */
+
+  /* Blacks & Neutrals */
+  --black-900: #000000; /* main header text */
+  --black-800: #1d2433; /* header text */
+  --gray-600: #344054; /* card gray, icon active */
+  --gray-500: #475367; /* 2nd icon color */
+  --gray-400: #647995; /* primary text, icon color */
+
+  /* White */
+  --white-100: #ffffff; /* white text */
+
+  /* Accent */
+  --accent-100: #e7f0ff; /* accent color */
+
+  /* Warning */
+  --warning-100: #fef4e6;
+  --warning-700: #7a4504;
+
+  /* Error */
+  --error-100: #fbeae9;
+  --error-700: #9e0a05;
+
+  /* Rating */
+  --rating-500: #f4b93e;
+}
+
+@theme inline {
+  /* Backgrounds */
+  --color-background-neutral: var(
+    --background-neutral
+  ); /* outermost background */
+  --color-background: var(--background-white); /* innermost background */
+  --color-card: var(--background-white); /* card bg */
+  --color-popover: var(--background-white); /* popovers bg */
+
+  /* Blues */
+  --color-blue-light: var(--blue-300); /* buttons bg and primary color */
+  --color-blue: var(--blue-500); /* card blue */
+  --color-blue-dark: var(--blue-700); /* dark buttons bg (smaller buttons) */
+  --color-blue-deep: var(--blue-900); /* deepest */
+
+  /* Neutrals / Text */
+  --color-black: var(--black-900); /* main header text */
+  --color-black-secondary: var(--black-800); /* header text */
+  --color-gray-dark: var(--gray-600); /* card gray, icon active */
+  --color-gray: var(--gray-500); /* 2nd icon color */
+  --color-gray-light: var(--gray-400); /* primary text, icon color */
+
+  /* Whites / Text */
+  --color-white: var(--white-100); /* white text */
+
+  /* Accent */
+  --color-accent: var(--accent-100); /* accent color */
+
+  /* Warning */
+  --color-warning-background: var(--warning-100); /* warning background */
+  --color-warning-foreground: var(--warning-700); /* warning foreground */
+
+  /* Error */
+  --color-error-background: var(--error-100); /* error background */
+  --color-error-foreground: var(--error-700); /* error foreground */
+
+  /* Rating */
+  --color-rating: var(--rating-500); /* star / rating color */
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
