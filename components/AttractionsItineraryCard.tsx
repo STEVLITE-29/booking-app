@@ -89,6 +89,7 @@ export const AttractionsItineraryCard: React.FC<
           <div className="relative w-50 h-full rounded-sm overflow-hidden bg-background-neutral shrink-0 group">
             {currentPhotoUrl ? (
               <Image
+                key={currentPhotoUrl}
                 src={currentPhotoUrl}
                 alt={attraction.name}
                 fill
@@ -101,7 +102,7 @@ export const AttractionsItineraryCard: React.FC<
             )}
 
             {/* Image counter and navigation */}
-            {allPhotos.length > 0 && (
+            {allPhotos.length > 1 && (
               <>
                 {/* Left chevron */}
                 <button

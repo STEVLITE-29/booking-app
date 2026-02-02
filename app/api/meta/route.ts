@@ -1,16 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Use RAPIDAPI_KEY for server-side calls (not NEXT_PUBLIC_ which is for browser)
-const API_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
+// Use server-side env first for API key; fall back to NEXT_PUBLIC if present
+const API_KEY =
+  process.env.RAPIDAPI_KEY || process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
 const API_HOST = "booking-com15.p.rapidapi.com";
 
-if (!API_KEY) {
-  console.error("Warning: NEXT_PUBLIC_RAPIDAPI_KEY is not set");
+const API_KEY_MISSING = !API_KEY;
+if (API_KEY_MISSING) {
+  console.warn(
+    "[Meta API] RAPIDAPI_KEY and NEXT_PUBLIC_RAPIDAPI_KEY are not set. Using fallback data.",
+  );
 }
 
 const headers = {
   "x-rapidapi-host": API_HOST,
   "x-rapidapi-key": API_KEY,
+};
+
+// Fallback exchange rates when API key is missing
+const FALLBACK_EXCHANGE_RATES: Record<string, Record<string, number>> = {
+  USD: {
+    USD: 1,
+    EUR: 0.92,
+    GBP: 0.79,
+    JPY: 145.5,
+    AUD: 1.53,
+    CAD: 1.36,
+    CNY: 7.24,
+    INR: 83.12,
+    MXN: 17.05,
+    BRL: 4.97,
+  },
 };
 
 export async function GET(request: NextRequest) {
@@ -23,6 +43,50 @@ export async function GET(request: NextRequest) {
       { error: "Missing action parameter" },
       { status: 400 },
     );
+  }
+
+  // If no API key, return fallback for supported actions
+  if (API_KEY_MISSING) {
+    console.log(
+      `[Meta API] No API key; returning fallback for action: ${action}`,
+    );
+
+    if (action === "getExchangeRates") {
+      return NextResponse.json(
+        {
+          rates: FALLBACK_EXCHANGE_RATES[baseCurrency] ||
+            FALLBACK_EXCHANGE_RATES.USD || {
+              [baseCurrency]: 1,
+            },
+        },
+        { status: 200 },
+      );
+    }
+
+    if (action === "getLanguages") {
+      return NextResponse.json(
+        { languages: ["en", "es", "fr", "de", "it", "pt"] },
+        { status: 200 },
+      );
+    }
+
+    if (action === "getCurrency") {
+      return NextResponse.json(
+        { currencies: ["USD", "EUR", "GBP", "JPY"] },
+        { status: 200 },
+      );
+    }
+
+    // For locationToLatLong, we need to fail gracefully but not throw
+    if (action === "locationToLatLong") {
+      return NextResponse.json(
+        {
+          error:
+            "API key not configured. Location geocoding unavailable in demo mode.",
+        },
+        { status: 503 },
+      );
+    }
   }
 
   try {

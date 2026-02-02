@@ -16,15 +16,15 @@ const sideLinks: SideLink[] = [
   { label: "Activities", href: "/activities", icon: "/RoadHorizon.svg" },
   { label: "Hotels", href: "/hotels", icon: "/Buildings.svg" },
   { label: "Flights", href: "/flights", icon: "/AirplaneTilt.svg" },
-  { label: "Study", href: "/study", icon: "/Student.svg" },
-  { label: "Visa", href: "/visa", icon: "/NewspaperClipping.svg" },
-  { label: "Immigration", href: "/immigration", icon: "/SuitcaseRolling.svg" },
-  { label: "Medical", href: "/medical", icon: "/FirstAidKit.svg" },
-  {
-    label: "Vacation Packages",
-    href: "/vacation-packages",
-    icon: "/Package.svg",
-  },
+  // { label: "Study", href: "/study", icon: "/Student.svg" },
+  // { label: "Visa", href: "/visa", icon: "/NewspaperClipping.svg" },
+  // { label: "Immigration", href: "/immigration", icon: "/SuitcaseRolling.svg" },
+  // { label: "Medical", href: "/medical", icon: "/FirstAidKit.svg" },
+  // {
+  //   label: "Vacation Packages",
+  //   href: "/vacation-packages",
+  //   icon: "/Package.svg",
+  // },
 ];
 
 const SideLinks: React.FC = () => {

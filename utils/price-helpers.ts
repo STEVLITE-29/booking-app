@@ -34,6 +34,7 @@ let exchangeRatesCache: {
 /**
  * Load exchange rates from a meta service response.
  * Expects an object with `rates` mapping currency -> rate.
+ * Falls back gracefully on error without throwing.
  */
 export const loadExchangeRates = async (
   fetchRatesFn: (base?: string) => Promise<any>,
@@ -54,10 +55,16 @@ export const loadExchangeRates = async (
       }
 
       // If we got a response but no rates, no need to retry further
+      console.warn(`[Exchange Rates] Response received but no rates found`);
       return null;
     } catch (e) {
-      console.error(`Failed to load exchange rates (attempt ${attempt}):`, e);
-      if (attempt >= maxAttempts) return null;
+      console.warn(`Failed to load exchange rates (attempt ${attempt}):`, e);
+      if (attempt >= maxAttempts) {
+        console.info(
+          `[Exchange Rates] All attempts failed; app will use fallback 1:1 rates`,
+        );
+        return null;
+      }
       await sleep(600);
     }
   }

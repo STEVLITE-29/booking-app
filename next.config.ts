@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  trailingSlash: true,
-  basePath: "/my-booking-app",
-  assetPrefix: "/my-booking-app/",
+  // trailingSlash: true,
+  // basePath: "/my-booking-app",
+  // assetPrefix: "/my-booking-app/",
   images: {
     remotePatterns: [
       {
