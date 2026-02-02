@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export",
+  trailingSlash: true,
+  basePath: "/my-booking-app",
+  assetPrefix: "/my-booking-app/",
   images: {
     remotePatterns: [
       {
