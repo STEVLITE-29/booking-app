@@ -264,7 +264,7 @@ export default function Home() {
 
       {/* Trip Header with Background Image */}
       <div
-        className="relative rounded-sm overflow-hidden mb-2 h-60 w-full"
+        className="relative rounded-sm overflow-hidden mb-2 h-40 md:h-60 w-full"
         style={{
           backgroundImage: currentTrip.bannerImage
             ? `url(${currentTrip.bannerImage})`
@@ -274,7 +274,7 @@ export default function Home() {
         }}
       ></div>
       <div className="w-full">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col md:flex-row items-start justify-between">
           <div className="">
             <div className="inline-flex font-medium py-1 px-2 items-center gap-2 mb-1 bg-warning-background text-warning-foreground">
               <Calendar className="w-5 h-5" />
@@ -360,7 +360,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="inline-flex gap-3 mt-2">
+        <div className="flex flex-col md:flex-row gap-3 mt-2">
           <div className="bg-blue-deep rounded-sm py-4 px-3 max-w-60">
             <h3 className="text-white text-lg font-semibold mb-4">
               Activities

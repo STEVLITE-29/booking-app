@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ItineraryHotel } from "@/types/itinerary-types";
 import {
   X,
@@ -22,6 +22,10 @@ interface HotelItineraryCardProps {
   onEditDetails?: (hotel: ItineraryHotel) => void;
 }
 
+/**
+ * Displays a booked hotel with image carousel, details, and actions.
+ * Responsive layout: stacked on mobile, image sidebar on desktop.
+ */
 export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
   hotel,
   onViewDetails,
@@ -54,41 +58,73 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
   const reviewScore = hotel.property?.reviewScore || 0;
   const reviewCount = hotel.property?.reviewCount || 0;
 
-  // Get all available photos
-  const allPhotos = [];
-  if (hotel.property?.mainPhotoUrl) {
-    allPhotos.push(hotel.property.mainPhotoUrl);
-  }
-  if (hotel.property?.photoUrls && Array.isArray(hotel.property.photoUrls)) {
-    allPhotos.push(
-      ...hotel.property.photoUrls.filter(
-        (url) => url !== hotel.property?.mainPhotoUrl,
-      ),
-    );
-  }
+  // Build initial photo list from hotel props
+  const buildPhotos = () => {
+    const list: string[] = [];
+    if (hotel.property?.mainPhotoUrl) list.push(hotel.property.mainPhotoUrl);
+    if (hotel.property?.photoUrls && Array.isArray(hotel.property.photoUrls)) {
+      list.push(
+        ...hotel.property.photoUrls.filter(
+          (url) => url !== hotel.property?.mainPhotoUrl,
+        ),
+      );
+    }
+    return list;
+  };
 
-  const currentPhotoUrl = allPhotos[currentImageIndex] || null;
+  // Persist photos in localStorage per hotel so they survive refresh/navigation
+  const storageKey = `hotel-photos:${hotel.hotel_id || hotel.property?.name}`;
+  const [photos, setPhotos] = useState<string[]>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) return JSON.parse(stored) as string[];
+      }
+    } catch {
+      // ignore
+    }
+    return buildPhotos();
+  });
+
+  const currentPhotoUrl = photos[currentImageIndex] || null;
+
+  useEffect(() => {
+    // Rebuild photos when hotel prop changes and merge with storage
+    const built = buildPhotos();
+    setPhotos((prev) => {
+      // prefer stored order but ensure all built photos are present
+      const merged = Array.from(new Set([...prev, ...built]));
+      try {
+        if (typeof window !== "undefined")
+          localStorage.setItem(storageKey, JSON.stringify(merged));
+      } catch {
+        // ignore
+      }
+      return merged;
+    });
+    // clamp index
+    setCurrentImageIndex((i) => (i >= built.length ? 0 : i));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hotel.property?.mainPhotoUrl, hotel.property?.photoUrls]);
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === 0 ? allPhotos.length - 1 : prev - 1,
+      prev === 0 ? Math.max(0, photos.length - 1) : prev - 1,
     );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === allPhotos.length - 1 ? 0 : prev + 1,
-    );
+    setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
   return (
-    <div className="bg-background rounded-sm hover:shadow-md transition-shadow flex w-full overflow-hidden">
-      {/* Hotel details – 95% */}
-      <div className="w-[95%] flex h-auto">
-        {/* image */}
-        <div className="h-full w-auto py-3 pl-3">
+    <div className="relative bg-background rounded-sm hover:shadow-md transition-shadow flex flex-col md:flex-row w-full overflow-hidden">
+      {/* Hotel details – full width on mobile, 95% on desktop */}
+      <div className="w-full md:w-[95%] flex flex-col md:flex-row h-auto">
+        {/* Image - full width on mobile, sidebar on desktop */}
+        <div className="h-48 md:h-full w-full md:w-auto py-0 md:py-3 pl-0 md:pl-3">
           {/* Image carousel */}
-          <div className="relative w-50 h-full rounded-sm overflow-hidden bg-background-neutral shrink-0 group">
+          <div className="relative w-full md:w-50 h-full rounded-t-sm md:rounded-sm overflow-hidden bg-background-neutral shrink-0 group">
             {currentPhotoUrl ? (
               <Image
                 key={currentPhotoUrl}
@@ -96,6 +132,19 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
                 alt={hotel.property.name}
                 fill
                 className="object-cover"
+                onError={() => {
+                  // remove broken image and persist
+                  setPhotos((prev) => {
+                    const next = prev.filter((p) => p !== currentPhotoUrl);
+                    try {
+                      if (typeof window !== "undefined")
+                        localStorage.setItem(storageKey, JSON.stringify(next));
+                    } catch {
+                      // ignore
+                    }
+                    return next;
+                  });
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -104,7 +153,7 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
             )}
 
             {/* Image counter and navigation */}
-            {allPhotos.length > 1 && (
+            {photos.length > 1 && (
               <>
                 {/* Left chevron */}
                 <button
@@ -126,20 +175,22 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
 
                 {/* Image counter */}
                 <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                  {currentImageIndex + 1} / {allPhotos.length}
+                  {currentImageIndex + 1} / {photos.length}
                 </div>
               </>
             )}
           </div>
         </div>
+
+        {/* Content area */}
         <div className="w-full">
           {/* Hotel info */}
-          <div className="flex justify-between items-start py-4 px-5 border-b border-[#E4E7EC]">
-            {/* Hotel image and name */}
-            <div className="flex items-start gap-2 flex-1">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 py-4 px-4 sm:px-5 border-b border-[#E4E7EC]">
+            {/* Hotel name and details */}
+            <div className="flex items-start gap-2 flex-1 w-full">
               <div className="flex flex-col gap-1 flex-1">
                 <div>
-                  <p className="font-semibold text-base text-black-secondary line-clamp-2 truncate">
+                  <p className="font-semibold text-base text-black-secondary line-clamp-2">
                     {hotel.property.name}
                   </p>
 
@@ -150,7 +201,7 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
                       : "Address not available"}
                   </p>
 
-                  <div className="flex gap-2 items-center mt-2">
+                  <div className="flex flex-wrap gap-2 items-center mt-2">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4 text-gray" />
                       <span className="text-sm text-gray-dark">
@@ -161,7 +212,7 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
                     </div>
                     {reviewScore > 0 && (
                       <>
-                        <Dot className="w-4 h-4 text-gray-light" />
+                        <Dot className="w-4 h-4 text-gray-light hidden sm:block" />
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 text-rating fill-current" />
                           <span className="text-sm font-medium text-gray-dark">
@@ -187,7 +238,7 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
             </div>
 
             {/* Hotel price */}
-            <div className="ml-4 shrink-0">
+            <div className="shrink-0 w-full sm:w-auto sm:ml-4">
               <p className="text-2xl font-semibold text-black">
                 {formatPrice(totalPrice, currency)}
               </p>
@@ -203,8 +254,8 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
           </div>
 
           {/* Booking details */}
-          <div className="flex flex-col gap-3 py-4 px-5 border-b border-[#E4E7EC]">
-            <div className="flex items-center gap-6 flex-wrap">
+          <div className="flex flex-col gap-3 py-4 px-4 sm:px-5 border-b border-[#E4E7EC]">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6">
               {hotel.checkinDate && (
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-gray shrink-0" />
@@ -258,8 +309,8 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
           </div>
 
           {/* Action Links */}
-          <div className="flex flex-col gap-4 py-4 px-5 border-t border-[#E4E7EC]">
-            <div className="flex gap-4">
+          <div className="py-4 px-4 sm:px-5">
+            <div className="flex flex-wrap gap-4">
               {onViewDetails && (
                 <button
                   onClick={() => onViewDetails(hotel)}
@@ -276,13 +327,22 @@ export const HotelItineraryCard: React.FC<HotelItineraryCardProps> = ({
         </div>
       </div>
 
-      {/* Close button – 5%  */}
+      {/* Close button – hidden on mobile, shown as sidebar on desktop */}
       <button
         onClick={() => removeHotel(hotel.hotel_id)}
-        aria-label="Remove activity"
-        className="w-[5%] bg-error-background text-error-foreground flex items-center justify-center hover:bg-warning-background hover:text-red-600 transition-colors"
+        aria-label="Remove hotel"
+        className="hidden md:flex md:w-[5%] bg-error-background text-error-foreground items-center justify-center hover:bg-warning-background hover:text-red-600 transition-colors"
       >
         <X className="w-5 h-5" />
+      </button>
+
+      {/* Mobile close button - shown at top right on mobile */}
+      <button
+        onClick={() => removeHotel(hotel.hotel_id)}
+        aria-label="Remove hotel"
+        className="md:hidden absolute top-2 right-2 p-2 bg-white/90 text-error-foreground rounded-full shadow-lg hover:bg-white transition-colors z-10"
+      >
+        <X className="w-4 h-4" />
       </button>
     </div>
   );

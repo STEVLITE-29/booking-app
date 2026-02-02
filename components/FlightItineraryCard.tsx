@@ -13,6 +13,10 @@ interface FlightItineraryCardProps {
   onEditDetails?: (flight: ItineraryFlight) => void;
 }
 
+/**
+ * Displays a booked flight with details, segments, and actions.
+ * Responsive layout: stacked on mobile, horizontal on desktop.
+ */
 export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
   flight,
   onViewDetails,
@@ -97,28 +101,29 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-sm hover:shadow-md transition-shadow flex w-full overflow-hidden">
-      {/* Flight details – 95% */}
-      <div className="w-[95%]">
-        {/* flight info */}
-        <div className="flex justify-between items-center py-4 px-5 border-b border-gray-200">
-          {/* flight code and name */}
-          <div className="flex items-center gap-3">
+    <div className="relative bg-white rounded-sm hover:shadow-md transition-shadow flex flex-col md:flex-row w-full overflow-hidden">
+      {/* Flight details – full width on mobile, 95% on desktop */}
+      <div className="w-full md:w-[95%]">
+        {/* Flight info */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 py-4 px-4 sm:px-5 border-b border-gray-200">
+          {/* Airline name and flight code */}
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <Image
               src="/AirplaneTilt.svg"
               alt="plane icon"
               width={30}
               height={50}
+              className="shrink-0"
             />
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-900 truncate">
                 {firstSegment.airlineName}
               </p>
-              <div className="flex gap-0.5 items-center text-gray-600">
+              <div className="flex gap-0.5 items-center text-gray-600 flex-wrap">
                 <span className="text-sm font-semibold">
                   {firstSegment.flightNumber}
                 </span>
-                <Dot className="w-5 h-5" />
+                <Dot className="w-5 h-5 hidden sm:block" />
                 <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded shrink-0">
                   {flight.cabinClass}
                 </span>
@@ -126,10 +131,10 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
             </div>
           </div>
 
-          {/* flight duration and date */}
-          <div className="flex items-center justify-between">
+          {/* Flight route and times - stack on mobile, side-by-side on desktop */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between w-full md:flex-1 gap-4 md:gap-0">
             {/* Departure */}
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start md:items-start">
               <p className="font-bold text-gray-900 leading-none text-2xl">
                 {formatTime(firstSegment.departureTime)}
               </p>
@@ -139,9 +144,9 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
             </div>
 
             {/* Flight Path */}
-            <div className="flex flex-col items-center flex-1 px-6 mr-4 ml-5 gap-2">
+            <div className="flex flex-col items-center flex-1 px-0 md:px-6 md:mr-4 md:ml-5 gap-2">
               {/* Top */}
-              <div className="flex gap-7">
+              <div className="flex gap-4 md:gap-7 w-full md:w-auto justify-between md:justify-center">
                 <PlaneTakeoff className="w-5 h-5 text-gray-400" />
                 <p className="text-sm text-gray-600 mb-2 font-medium">
                   Duration: {flight.totalDuration}
@@ -157,7 +162,7 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
               </div>
 
               {/* Bottom */}
-              <div className="flex gap-9 items-center text-gray-900">
+              <div className="flex gap-4 md:gap-9 items-center text-gray-900 w-full md:w-auto justify-between md:justify-center">
                 <p className="text-sm font-medium">
                   {firstSegment.departureAirport.code}
                 </p>
@@ -173,7 +178,7 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
             </div>
 
             {/* Arrival */}
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start md:items-start">
               <p className="font-bold text-gray-900 leading-none text-2xl">
                 {formatTime(lastSegment.arrivalTime)}
               </p>
@@ -183,8 +188,8 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
             </div>
           </div>
 
-          {/* flight price */}
-          <div>
+          {/* Flight price */}
+          <div className="w-full md:w-auto">
             <p className="text-2xl font-semibold text-gray-900">
               {formatFlightPrice(flight.price, {
                 targetCurrency: getPreferredCurrency(),
@@ -193,8 +198,8 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
           </div>
         </div>
 
-        {/* facilities info */}
-        <div className="flex flex-col gap-4 py-4 px-5 border-b border-gray-200">
+        {/* Facilities info */}
+        <div className="flex flex-col gap-4 py-4 px-4 sm:px-5 border-b border-gray-200">
           {flight.facilities && flight.facilities.length > 0 && (
             <div className="flex items-start gap-3 flex-wrap">
               <span className="text-xs text-gray-500 font-medium shrink-0">
@@ -245,9 +250,9 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
           )}
         </div>
 
-        {/* details buttons */}
-        <div className="flex flex-col gap-4 py-4 px-5">
-          <div className="flex gap-4">
+        {/* Details buttons */}
+        <div className="py-4 px-4 sm:px-5">
+          <div className="flex flex-wrap gap-4">
             {onViewDetails && (
               <button
                 onClick={() => onViewDetails(flight)}
@@ -268,13 +273,22 @@ export const FlightItineraryCard: React.FC<FlightItineraryCardProps> = ({
         </div>
       </div>
 
-      {/* Close button */}
+      {/* Close button – hidden on mobile, shown as sidebar on desktop */}
       <button
         onClick={() => removeFlight(flight.id)}
-        aria-label="Remove activity"
-        className="w-[5%] bg-error-background text-error-foreground flex items-center justify-center hover:bg-warning-background hover:text-red-600 transition-colors"
+        aria-label="Remove flight"
+        className="hidden md:flex md:w-[5%] bg-error-background text-error-foreground items-center justify-center hover:bg-warning-background hover:text-red-600 transition-colors"
       >
         <X className="w-5 h-5" />
+      </button>
+
+      {/* Mobile close button - shown at top right on mobile */}
+      <button
+        onClick={() => removeFlight(flight.id)}
+        aria-label="Remove flight"
+        className="md:hidden absolute top-2 right-2 p-2 bg-white/90 text-error-foreground rounded-full shadow-lg hover:bg-white transition-colors z-10"
+      >
+        <X className="w-4 h-4" />
       </button>
     </div>
   );
