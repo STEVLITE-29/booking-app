@@ -8,9 +8,17 @@ const nextConfig: NextConfig = {
         hostname: "**.bstatic.com",
         pathname: "/xdata/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.kiwi.com",
+        pathname: "/**",
+      },
     ],
-
-    domains: ["images.unsplash.com", "images.kiwi.com"],
   },
 };
 
