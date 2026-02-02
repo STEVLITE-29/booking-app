@@ -6,9 +6,12 @@ import {
   mockAttractionLocations,
 } from "@/data/attractions";
 
-const BASE_URL = "https://booking-com15.p.rapidapi.com/api/v1/attraction";
-const API_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
 const API_HOST = "booking-com15.p.rapidapi.com";
+const BASE_URL = `https://${API_HOST}/api/v1/attraction`;
+const API_KEY =
+  process.env.NEXT_PUBLIC_RAPIDAPI_KEY ||
+  process.env.NEXT_PUBLIC_RAPIDAPI_KEYTWO ||
+  "";
 
 // Toggle between mock and real API
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false";

@@ -451,3 +451,5 @@ export const HotelSearchPage: React.FC = () => {
     </div>
   );
 };
+
+export default HotelSearchPage;

@@ -423,9 +423,4 @@ Centralized color and spacing tokens:
 
 This project is part of an assessment task and is available for educational purposes.
 
-## 🤝 Contributing
-
-This is an assessment project. For feature requests or improvements, please document them in your project notes.
-
-
 **Note**: Remember to generate your own API keys from RapidAPI for production use. The mock data system is designed for development and testing without API quota concerns.

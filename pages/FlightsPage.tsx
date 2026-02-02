@@ -48,7 +48,7 @@ export const FlightSearchPage: React.FC = () => {
     "BEST" | "CHEAPEST" | "FASTEST"
   >("BEST");
 
-  // Parse duration string 
+  // Parse duration string
   const parseDurationToMinutes = (duration: string): number => {
     const hoursMatch = duration.match(/(\d+)h/);
     const minutesMatch = duration.match(/(\d+)m/);
@@ -88,7 +88,6 @@ export const FlightSearchPage: React.FC = () => {
           const durationA = parseDurationToMinutes(a.totalDuration || "0h 0m");
           const durationB = parseDurationToMinutes(b.totalDuration || "0h 0m");
 
-          
           const scoreA = priceA / 100 + durationA / 60;
           const scoreB = priceB / 100 + durationB / 60;
 
@@ -667,3 +666,5 @@ export const FlightSearchPage: React.FC = () => {
     </div>
   );
 };
+
+export default FlightSearchPage;

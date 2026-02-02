@@ -4,9 +4,12 @@ import {
   getMockHotelDetails,
 } from "@/data/hotels";
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
 const API_HOST = "booking-com15.p.rapidapi.com";
 const BASE_URL = `https://${API_HOST}/api/v1/hotels`;
+const API_KEY =
+  process.env.NEXT_PUBLIC_RAPIDAPI_KEY ||
+  process.env.NEXT_PUBLIC_RAPIDAPI_KEYTWO ||
+  "";
 
 const headers = {
   "x-rapidapi-host": API_HOST,
