@@ -1,0 +1,96 @@
+import { NextRequest, NextResponse } from "next/server";
+
+// Use RAPIDAPI_KEY for server-side calls (not NEXT_PUBLIC_ which is for browser)
+const API_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
+const API_HOST = "booking-com15.p.rapidapi.com";
+
+if (!API_KEY) {
+  console.error("Warning: NEXT_PUBLIC_RAPIDAPI_KEY is not set");
+}
+
+const headers = {
+  "x-rapidapi-host": API_HOST,
+  "x-rapidapi-key": API_KEY,
+};
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const action = searchParams.get("action");
+  const baseCurrency = searchParams.get("base_currency") || "USD";
+
+  if (!action) {
+    return NextResponse.json(
+      { error: "Missing action parameter" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    let url = "";
+
+    switch (action) {
+      case "getLanguages":
+        url = `https://${API_HOST}/api/v1/meta/getLanguages`;
+        break;
+      case "getCurrency":
+        url = `https://${API_HOST}/api/v1/meta/getCurrency`;
+        break;
+      case "getExchangeRates":
+        url = `https://${API_HOST}/api/v1/meta/getExchangeRates?base_currency=${encodeURIComponent(
+          baseCurrency,
+        )}`;
+        break;
+      case "locationToLatLong":
+        const query = searchParams.get("query");
+        if (!query) {
+          return NextResponse.json(
+            { error: "Missing query parameter" },
+            { status: 400 },
+          );
+        }
+        url = `https://${API_HOST}/api/v1/meta/locationToLatLong?query=${encodeURIComponent(
+          query,
+        )}`;
+        break;
+      default:
+        return NextResponse.json(
+          { error: `Unknown action: ${action}` },
+          { status: 400 },
+        );
+    }
+
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `[Meta API] ${action} failed: ${response.status} ${response.statusText}`,
+        errorText.substring(0, 200),
+      );
+
+      // Rate limit fallback for exchange rates
+      if (action === "getExchangeRates" && response.status === 429) {
+        console.warn("[Meta API] Rate limited, returning fallback rates");
+        return NextResponse.json(
+          { rates: { [baseCurrency]: 1 } },
+          { status: 200 },
+        );
+      }
+
+      throw new Error(`API Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`[Meta API] ${action} succeeded`);
+    return NextResponse.json(data);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Meta API] Error:", errorMessage);
+    return NextResponse.json(
+      {
+        error: `Internal Server Error: ${errorMessage}`,
+      },
+      { status: 500 },
+    );
+  }
+}

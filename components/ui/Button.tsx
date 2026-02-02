@@ -1,6 +1,6 @@
 import React from "react";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "danger";
+type ButtonVariant = "primary" | "secondary" | "outline" | "danger" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonProps = {
@@ -23,11 +23,12 @@ const Button = ({
   className = "",
 }: ButtonProps) => {
   const baseStyles =
-    "inline-flex items-center justify-center rounded-sm font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-light disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-sm font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-light disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
   const variants: Record<ButtonVariant, string> = {
     primary: "bg-blue-light text-white hover:bg-blue focus:ring-blue-light",
     secondary: "bg-accent text-blue hover:bg-accent/80 focus:ring-blue-light",
+    ghost: "bg-background text-blue-light hover:bg-accent/80 focus:ring-blue-light",
     outline:
       "border border-gray-400 text-gray-light hover:bg-background-neutral",
     danger:
