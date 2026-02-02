@@ -143,7 +143,7 @@ export const AttractionsItineraryCard: React.FC<
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4 text-gray" />
                       <span className="text-sm text-gray-dark">
-                        {attraction.ufiDetails.bCityName}
+                        {attraction.ufiDetails?.bCityName ?? "Unknown location"}
                       </span>
                     </div>
                     {attraction.reviewsStats && (
@@ -229,7 +229,7 @@ export const AttractionsItineraryCard: React.FC<
                 </div>
               )}
 
-              {attraction.cancellationPolicy.hasFreeCancellation && (
+              {attraction.cancellationPolicy?.hasFreeCancellation && (
                 <div className="flex items-center gap-2">
                   <svg
                     className="w-4 h-4 text-green-600"

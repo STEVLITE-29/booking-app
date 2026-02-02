@@ -14,7 +14,7 @@ const headers = {
 };
 
 // Toggle between mock and real API
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false";
 
 /**
  * Search for hotel destinations (cities, regions, etc.)
@@ -47,6 +47,34 @@ export const searchHotelDestination = async (query: string) => {
     }
 
     const data = await response.json();
+    // Normalize returned hotels to guarantee price field
+    if (data && data.data && Array.isArray(data.data.hotels)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data.data.hotels = data.data.hotels.map((h: any) => {
+        const propPb = h.property?.priceBreakdown;
+        const gross =
+          propPb?.grossPrice?.value ?? propPb?.strikethroughPrice?.value ?? 0;
+
+        // Ensure top-level priceBreakdown exists for UI compatibility
+        h.priceBreakdown = h.priceBreakdown || propPb || {};
+        h.priceBreakdown.grossPrice = h.priceBreakdown.grossPrice || {};
+        h.priceBreakdown.grossPrice.value = gross;
+        h.priceBreakdown.grossPrice.currency =
+          h.priceBreakdown.grossPrice.currency ||
+          propPb?.grossPrice?.currency ||
+          propPb?.strikethroughPrice?.currency ||
+          h.property?.currency ||
+          "USD";
+
+        if (!gross || gross <= 0) {
+          console.warn(
+            `[Hotel Search by Coordinates] No valid price found for hotel ${h.property?.id}`,
+          );
+        }
+
+        return h;
+      });
+    }
     return data;
   } catch (error) {
     const msg =
@@ -322,15 +350,27 @@ export const searchHotels = async (params: {
     if (data && data.data && Array.isArray(data.data.hotels)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data.data.hotels = data.data.hotels.map((h: any) => {
+        const propPb = h.property?.priceBreakdown;
         const gross =
-          h.priceBreakdown?.grossPrice?.value ?? h.property?.minPrice ?? 0;
+          propPb?.grossPrice?.value ?? propPb?.strikethroughPrice?.value ?? 0;
+
+        // Ensure top-level priceBreakdown exists for UI compatibility
+        h.priceBreakdown = h.priceBreakdown || propPb || {};
+        h.priceBreakdown.grossPrice = h.priceBreakdown.grossPrice || {};
+        h.priceBreakdown.grossPrice.value = gross;
+        h.priceBreakdown.grossPrice.currency =
+          h.priceBreakdown.grossPrice.currency ||
+          propPb?.grossPrice?.currency ||
+          propPb?.strikethroughPrice?.currency ||
+          h.property?.currency ||
+          "USD";
+
         if (!gross || gross <= 0) {
-          const alt =
-            h.priceBreakdown?.publicPrice ?? h.property?.minPrice ?? 1;
-          h.priceBreakdown = h.priceBreakdown || {};
-          h.priceBreakdown.grossPrice = h.priceBreakdown.grossPrice || {};
-          h.priceBreakdown.grossPrice.value = alt || 1;
+          console.warn(
+            `[Hotel Search] No valid price found for hotel ${h.property?.id}`,
+          );
         }
+
         return h;
       });
     }
@@ -407,6 +447,34 @@ export const searchHotelsByCoordinates = async (params: {
     }
 
     const data = await response.json();
+    // Normalize returned hotels to guarantee price field
+    if (data && data.data && Array.isArray(data.data.hotels)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data.data.hotels = data.data.hotels.map((h: any) => {
+        const propPb = h.property?.priceBreakdown;
+        const gross =
+          propPb?.grossPrice?.value ?? propPb?.strikethroughPrice?.value ?? 0;
+
+        h.priceBreakdown = h.priceBreakdown || propPb || {};
+        h.priceBreakdown.grossPrice = h.priceBreakdown.grossPrice || {};
+        h.priceBreakdown.grossPrice.value = gross;
+        h.priceBreakdown.grossPrice.currency =
+          h.priceBreakdown.grossPrice.currency ||
+          propPb?.grossPrice?.currency ||
+          propPb?.strikethroughPrice?.currency ||
+          h.property?.currency ||
+          "USD";
+
+        if (!gross || gross <= 0) {
+          console.warn(
+            `[Hotel Search by Coordinates] No valid price found for hotel ${h.property?.id}`,
+          );
+        }
+
+        return h;
+      });
+    }
+
     return data;
   } catch (error) {
     const msg =

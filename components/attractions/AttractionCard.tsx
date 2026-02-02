@@ -78,7 +78,7 @@ const AttractionCard: React.FC<AttractionCardProps> = ({ attraction }) => {
               Bestseller
             </div>
           )}
-          {attraction.cancellationPolicy.hasFreeCancellation && (
+          {attraction.cancellationPolicy?.hasFreeCancellation && (
             <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
               Free Cancellation
             </div>
@@ -96,7 +96,7 @@ const AttractionCard: React.FC<AttractionCardProps> = ({ attraction }) => {
           <div className="flex items-center gap-1.5 text-gray-600 mb-2">
             <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="text-xs truncate">
-              {attraction.ufiDetails.bCityName}
+              {attraction.ufiDetails?.bCityName ?? "Unknown location"}
             </span>
           </div>
 

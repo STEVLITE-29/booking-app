@@ -10,7 +10,7 @@ const headers = {
 };
 
 // Toggle between mock and real API
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false";
 
 // API Response Types (matching Rapid API structure)
 interface APIAirport {

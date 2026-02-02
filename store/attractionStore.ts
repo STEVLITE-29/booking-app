@@ -197,7 +197,7 @@ export const useAttractionStore = create<AttractionState>((set) => ({
   filterByFreeCancellation: () =>
     set((state) => ({
       filteredAttractions: state.attractions.filter(
-        (a) => a.cancellationPolicy.hasFreeCancellation,
+        (a) => !!a.cancellationPolicy?.hasFreeCancellation,
       ),
     })),
 

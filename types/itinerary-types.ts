@@ -225,7 +225,11 @@ export function getTripStatistics(trip: TripItinerary): TripStatistics {
     },
     destinations: [
       trip.destination,
-      ...new Set(trip.activities.map((a) => a.ufiDetails.bCityName)),
+      ...new Set(
+        trip.activities.map(
+          (a) => a.ufiDetails?.bCityName || a.name || "Unknown location",
+        ),
+      ),
     ],
   };
 }

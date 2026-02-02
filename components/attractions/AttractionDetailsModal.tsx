@@ -328,10 +328,10 @@ const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
             <div className="flex items-center gap-2 bg-accent px-3 py-1.5 rounded-lg">
               <MapPin className="w-4 h-4 text-blue-light" />
               <span className="font-semibold text-xs text-gray-dark">
-                {attraction.ufiDetails.bCityName}
+                {attraction.ufiDetails?.bCityName ?? "Unknown location"}
               </span>
             </div>
-            {attraction.cancellationPolicy.hasFreeCancellation && (
+            {attraction.cancellationPolicy?.hasFreeCancellation && (
               <div className="flex items-center gap-2 bg-accent px-3 py-1.5 rounded-lg">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span className="font-semibold text-xs text-gray-dark">

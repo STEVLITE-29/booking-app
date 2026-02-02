@@ -216,7 +216,7 @@ const AttractionsPage: React.FC = () => {
 
     if (freeCancellationOnly) {
       filtered = filtered.filter(
-        (a) => a.cancellationPolicy.hasFreeCancellation,
+        (a) => !!a.cancellationPolicy?.hasFreeCancellation,
       );
     }
 

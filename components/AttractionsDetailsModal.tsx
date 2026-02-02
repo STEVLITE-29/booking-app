@@ -66,7 +66,7 @@ export const AttractionDetailsModal: React.FC<AttractionDetailsModalProps> = ({
             <div className="flex items-center gap-2 mt-2">
               <MapPin className="w-4 h-4 text-gray-500" />
               <p className="text-sm text-gray-600">
-                {attraction.ufiDetails.bCityName}
+                {attraction.ufiDetails?.bCityName ?? "Unknown location"}
               </p>
             </div>
             {attraction.reviewsStats && (

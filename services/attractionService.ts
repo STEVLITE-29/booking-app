@@ -11,7 +11,7 @@ const API_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || "";
 const API_HOST = "booking-com15.p.rapidapi.com";
 
 // Toggle between mock and real API
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false";
 
 // Common headers for all requests
 const getHeaders = () => ({
